@@ -25,9 +25,12 @@ jobs:
       - name: Fetch App Dependencies
         run: flutter pub get
 
-      - name: Compile Production APK
+      - name: Patch Notification Package Conflict
         run: |
-          flutter build apk --release --no-sound-null-safety --pub
+          flutter pub add flutter_local_notifications:17.3.0 --directory=.
+
+      - name: Compile Production APK
+        run: flutter build apk --release
 
       - name: Export Output Artifact
         uses: actions/upload-artifact@v4
