@@ -22,12 +22,12 @@ jobs:
           flutter-version: '3.24.5'
           cache: true
 
-      - name: Fetch App Dependencies
-        run: flutter pub get
-
       - name: Patch Notification Package Conflict
         run: |
-          flutter pub add flutter_local_notifications:17.3.0 --directory=.
+          echo -e "\ndependency_overrides:\n  flutter_local_notifications: ^17.3.0" >> pubspec.yaml
+
+      - name: Fetch App Dependencies
+        run: flutter pub get
 
       - name: Compile Production APK
         run: flutter build apk --release
