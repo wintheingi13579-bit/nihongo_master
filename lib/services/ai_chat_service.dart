@@ -1,77 +1,112 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
+// ------------------- ChatMessage Model -------------------
 class ChatMessage {
-  final String role;
-  final String jp;
-  final String en;
+  final String text;
+  final bool isUser;
+  final DateTime timestamp;
+  final String? romaji;      // romaji version of the message (if any)
+  final String? correction;  // grammatical correction (if any)
 
-  ChatMessage({required this.role, required this.jp, this.en = ''});
-}
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    DateTime? timestamp,
+    this.romaji,
+    this.correction,
+  }) : timestamp = timestamp ?? DateTime.now();
 
-class AiChatService {
-  AiChatService._();
-  static final AiChatService instance = AiChatService._();
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'isUser': isUser,
+        'timestamp': timestamp.toIso8601String(),
+        'romaji': romaji,
+        'correction': correction,
+      };
 
-  // 🧠 THIS IS THE FIX FOR THE LOOP
-  final List<Map<String, String>> _history = [];
-
-  Future<ChatMessage> reply(String userText) async {
-    final prefs = await SharedPreferences.getInstance();
-    final url = prefs.getString('ai_url') ?? '';
-    final key = prefs.getString('ai_key') ?? '';
-
-    if (url.isEmpty || key.isEmpty) {
-      return ChatMessage(role: 'ai', jp: 'Please set API Key in settings.', en: 'System Error');
-    }
-
-    try {
-      // 1. Initialize System
-      if (_history.isEmpty) {
-        _history.add({'role': 'system', 'content': 'You are a Japanese tutor. Reply in JSON: {"jp":"..","en":".."}'});
-      }
-
-      // 2. Add User Message
-      _history.add({'role': 'user', 'content': userText});
-
-      // 3. Send Request
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $key'},
-        body: jsonEncode({'model': 'gpt-3.5-turbo', 'messages': _history, 'response_format': {'type': 'json_object'}}),
+  factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
+        text: json['text'],
+        isUser: json['isUser'],
+        timestamp: DateTime.parse(json['timestamp']),
+        romaji: json['romaji'],
+        correction: json['correction'],
       );
-
-      // 4. Process Response
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-      final content = data['choices'][0]['message']['content'];
-      
-      _history.add({'role': 'assistant', 'content': content}); // Save to history
-      final j = jsonDecode(content);
-      
-      return ChatMessage(role: 'ai', jp: j['jp'] ?? '', en: j['en'] ?? '');
-    } catch (e) {
-      return ChatMessage(role: 'ai', jp: 'Error connecting.', en: e.toString());
-    }
-  }
-
-  void clearMemory() {
-    _history.clear();
-  }
 }
+
+// ------------------- AchatService -------------------
 class AchatService {
   static final AchatService instance = AchatService._internal();
   factory AchatService() => instance;
   AchatService._internal();
 
+  // --- casual mode setter/getter ---
   bool _casual = false;
 
   set casual(bool value) {
     _casual = value;
-    // Adjust AI prompt style here if needed
+    // You can adjust the AI system prompt here if needed
   }
 
   bool get casual => _casual;
-  
-  // ... rest of your existing code
+
+  // --- Other existing properties (keep yours) ---
+  // Example: apiKey, model, etc.
+  final String _apiKey = 'YOUR_API_KEY'; // Replace with your actual key
+  final String _apiUrl = 'https://api.openai.com/v1/chat/completions';
+
+  Future<ChatMessage> sendMessage(String userMessage) async {
+    // Build system prompt based on casual/formal
+    final systemPrompt = _casual
+        ? 'You are a friendly, casual Japanese conversation partner. Use plain forms (da, dazo, jan).'
+        : 'You are a polite Japanese tutor. Use desu/masu forms. Correct the user\'s grammar when needed.';
+
+    final response = await http.post(
+      Uri.parse(_apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_apiKey',
+      },
+      body: jsonEncode({
+        'model': 'gpt-3.5-turbo',
+        'messages': [
+          {'role': 'system', 'content': systemPrompt},
+          {'role': 'user', 'content': userMessage},
+        ],
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final aiText = data['choices'][0]['message']['content'];
+
+      // Simple extraction for romaji and correction (example logic)
+      String? romaji = _extractRomaji(aiText);
+      String? correction = _extractCorrection(aiText);
+
+      return ChatMessage(
+        text: aiText,
+        isUser: false,
+        romaji: romaji,
+        correction: correction,
+      );
+    } else {
+      throw Exception('Failed to get AI response');
+    }
+  }
+
+  String? _extractRomaji(String text) {
+    // Dummy implementation – replace with your own logic
+    if (text.contains('romaji:')) {
+      return text.split('romaji:')[1].split('\n')[0].trim();
+    }
+    return null;
+  }
+
+  String? _extractCorrection(String text) {
+    if (text.contains('correction:')) {
+      return text.split('correction:')[1].split('\n')[0].trim();
+    }
+    return null;
+  }
 }
