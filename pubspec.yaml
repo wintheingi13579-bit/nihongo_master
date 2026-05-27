@@ -23,7 +23,7 @@ dependencies:
   cupertino_icons: ^1.0.6
 
   # --- State management (lightweight, low-RAM) ---
-  provider: ^6.1.1
+  provider: ^6.1.2
 
   # --- Local database (offline-first) ---
   sqflite: ^2.3.0
