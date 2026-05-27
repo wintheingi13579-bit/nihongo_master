@@ -59,3 +59,19 @@ class AiChatService {
     _history.clear();
   }
 }
+class AchatService {
+  static final AchatService instance = AchatService._internal();
+  factory AchatService() => instance;
+  AchatService._internal();
+
+  bool _casual = false;
+
+  set casual(bool value) {
+    _casual = value;
+    // Adjust AI prompt style here if needed
+  }
+
+  bool get casual => _casual;
+  
+  // ... rest of your existing code
+}
