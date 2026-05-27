@@ -22,7 +22,7 @@ class AiChatService {
   AiChatService._();
   static final AiChatService instance = AiChatService._();
 
-  // 🧠 NEW: This memory list fixes the loop!
+  // 🧠 THIS LIST FIXES THE LOOP
   final List<Map<String, String>> _history = [];
 
   Future<ChatMessage> reply(String userText) async {
@@ -40,7 +40,7 @@ class AiChatService {
   }
 
   Future<ChatMessage> _fetchOnline(String text, String url, String key) async {
-    // 1. Setup System Prompt (Only once)
+    // 1. Initialize System (Only once)
     if (_history.isEmpty) {
       _history.add({
         'role': 'system', 
@@ -48,10 +48,10 @@ class AiChatService {
       });
     }
 
-    // 2. Add User Message to Memory
+    // 2. Add User Input to History
     _history.add({'role': 'user', 'content': text});
 
-    // 3. Send WHOLE Memory to API (This fixes the bug)
+    // 3. Send FULL History
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -60,12 +60,12 @@ class AiChatService {
       },
       body: jsonEncode({
         'model': 'gpt-3.5-turbo', 
-        'messages': _history, 
+        'messages': _history, // <--- This stops the loop
         'response_format': {'type': 'json_object'},
       }),
     );
 
-    // 4. Save AI Response to Memory
+    // 4. Save AI Response to History
     final data = jsonDecode(utf8.decode(response.bodyBytes));
     final content = data['choices'][0]['message']['content'];
     _history.add({'role': 'assistant', 'content': content});
