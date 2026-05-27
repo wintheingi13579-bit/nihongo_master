@@ -24,7 +24,7 @@ jobs:
 
       - name: Patch Notification Package Conflict
         run: |
-          echo -e "\ndependency_overrides:\n  flutter_local_notifications: ^17.3.0" >> pubspec.yaml
+          echo -e "\ndependency_overrides:\n  flutter_local_notifications: ^17.2.4" >> pubspec.yaml
 
       - name: Fetch App Dependencies
         run: flutter pub get
