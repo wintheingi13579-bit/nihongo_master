@@ -1,0 +1,14 @@
+[
+  {"title":"は (wa) — Topic particle","jlpt":"N5","explanation":"は marks the topic of the sentence (pronounced 'wa', not 'ha'). It tells the listener what we are talking about.","example":"私は学生です。","example_en":"As for me, I am a student."},
+  {"title":"を (wo) — Object particle","jlpt":"N5","explanation":"を marks the direct object of a verb. It is pronounced 'o'.","example":"パンを食べます。","example_en":"I eat bread."},
+  {"title":"です — to be (polite)","jlpt":"N5","explanation":"です is the polite copula. Attach to nouns or i-adjectives to make polite statements.","example":"これは本です。","example_en":"This is a book."},
+  {"title":"ます-form","jlpt":"N5","explanation":"The polite present/future verb form. Replace る with ます for ru-verbs.","example":"食べます。","example_en":"I eat / I will eat."},
+  {"title":"て-form","jlpt":"N5","explanation":"Connects clauses, makes requests, expresses ongoing actions.","example":"食べてください。","example_en":"Please eat."},
+  {"title":"〜ている (ongoing)","jlpt":"N5","explanation":"て-form + いる expresses an ongoing action or resulting state.","example":"今勉強しています。","example_en":"I am studying now."},
+  {"title":"〜たい (want to)","jlpt":"N5","explanation":"Replace ます with たい to express desire.","example":"日本へ行きたいです。","example_en":"I want to go to Japan."},
+  {"title":"から (because)","jlpt":"N4","explanation":"から after a clause gives a reason.","example":"暑いから、水を飲みます。","example_en":"Because it's hot, I drink water."},
+  {"title":"〜なければなりません","jlpt":"N4","explanation":"Expresses obligation ('must').","example":"勉強しなければなりません。","example_en":"I must study."},
+  {"title":"〜ようと思う","jlpt":"N3","explanation":"Expresses intention.","example":"日本に住もうと思います。","example_en":"I'm thinking of living in Japan."},
+  {"title":"〜にちがいない","jlpt":"N2","explanation":"Strong assumption: 'must be'.","example":"彼は来るにちがいない。","example_en":"He must be coming."},
+  {"title":"〜ざるをえない","jlpt":"N1","explanation":"'Cannot help but'; reluctant necessity.","example":"認めざるをえない。","example_en":"I have no choice but to admit it."}
+]

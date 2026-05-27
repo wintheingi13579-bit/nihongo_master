@@ -1,0 +1,57 @@
+// =============================================================
+// android/app/build.gradle - Android module config
+// =============================================================
+// Optimized for low-end devices: minSdk 21, R8 shrinking, abiFilters
+// =============================================================
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace "com.nihongo.master"
+    compileSdk 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
+
+    defaultConfig {
+        applicationId "com.nihongo.master"
+        minSdkVersion 21      // Android 5.0+ — runs on very old phones
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            // Default debug signing so users can install without keystore.
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+        }
+    }
+
+    // Smaller APK → only build for common Android phone CPUs
+    splits {
+        abi {
+            enable true
+            reset()
+            include "armeabi-v7a", "arm64-v8a"
+            universalApk true
+        }
+    }
+}
+
+flutter { source "../.." }
+
+dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"
+}

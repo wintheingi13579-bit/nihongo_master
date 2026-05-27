@@ -1,0 +1,70 @@
+# =============================================================
+# Nihongo Master - Flutter project configuration
+# =============================================================
+# This file tells Flutter:
+#   - The name of your app
+#   - Which packages (libraries) to download
+#   - Which assets (images, audio, JSON) to bundle into the APK
+#
+# After editing this file always run:  flutter pub get
+# =============================================================
+name: nihongo_master
+description: A complete offline-first Japanese learning app for beginners to intermediate learners.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # --- State management (lightweight, low-RAM) ---
+  provider: ^6.1.1
+
+  # --- Local database (offline-first) ---
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  path_provider: ^2.1.1
+
+  # --- Local key-value storage for settings/streaks ---
+  shared_preferences: ^2.2.2
+
+  # --- Audio playback for pronunciation ---
+  audioplayers: ^5.2.1
+
+  # --- Text-to-speech (free, offline on most devices) ---
+  flutter_tts: ^3.8.5
+
+  # --- Speech recognition (uses Android built-in, free) ---
+  speech_to_text: ^6.6.0
+
+  # --- HTTP for AI chat backend (optional) ---
+  http: ^1.1.2
+
+  # --- Pretty gradients & animations ---
+  flutter_animate: ^4.3.0
+
+  # --- Local notifications (motivational reminders) ---
+  flutter_local_notifications: ^16.3.0
+
+  # --- Home-screen widget for daily word ---
+  home_widget: ^0.4.1
+
+  # --- Vector icons ---
+  flutter_svg: ^2.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
+    - assets/images/
+    - assets/audio/
