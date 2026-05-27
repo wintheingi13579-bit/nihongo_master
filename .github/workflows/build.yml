@@ -19,7 +19,7 @@ jobs:
       - name: Setup Flutter Engine
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          flutter-version: '3.24.5'
           cache: true
 
       - name: Fetch App Dependencies
