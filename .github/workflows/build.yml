@@ -28,23 +28,23 @@ jobs:
 
       - name: Generate Missing Project Assets
         run: |
-          # Create the missing asset folders declared in pubspec
+          # Create missing asset directories
           mkdir -p assets/images assets/audio
           touch assets/images/.gitkeep assets/audio/.gitkeep
           
-          # Create standard Android mipmap folder structures for the app icon
+          # Create mipmap target directories
           mkdir -p android/app/src/main/res/mipmap-hdpi
           mkdir -p android/app/src/main/res/mipmap-mdpi
           mkdir -p android/app/src/main/res/mipmap-xhdpi
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
           
-          # Download a temporary generic placeholder icon to satisfy the compiler
-          curl -s -o android/app/src/main/res/mipmap-hdpi/ic_launcher.png https://placeholder.co/72x72.png
-          curl -s -o android/app/src/main/res/mipmap-mdpi/ic_launcher.png https://placeholder.co/48x48.png
-          curl -s -o android/app/src/main/res/mipmap-xhdpi/ic_launcher.png https://placeholder.co/96x96.png
-          curl -s -o android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png https://placeholder.co/144x144.png
-          curl -s -o android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png https://placeholder.co/192x192.png
+          # Safely write a tiny 1x1 blank PNG block locally to appease the Android manifest
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" | base64 -d > android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
       - name: Fetch App Dependencies
         run: flutter pub get
