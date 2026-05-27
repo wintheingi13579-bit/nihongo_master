@@ -1,118 +1,116 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/chat_notifier.dart';
-import '../services/ai_chat_service.dart'; 
+import '../services/ai_chat_service.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
-
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _textController = TextEditingController();
+  final List<ChatMessage> _messages = [];
+  final TextEditingController _controller = TextEditingController();
+  bool _showRomaji = false;
+  bool _isCasual = false;  // local toggle state
+
+  @override
+  void initState() {
+    super.initState();
+    // Sync local state with service (optional)
+    _isCasual = AchatService.instance.casual;
+  }
+
+  void _sendMessage() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    // Add user message
+    setState(() {
+      _messages.add(ChatMessage(
+        text: text,
+        isUser: true,
+      ));
+      _controller.clear();
+    });
+
+    // Get AI reply
+    try {
+      final aiReply = await AchatService.instance.sendMessage(text);
+      setState(() {
+        _messages.add(aiReply);
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add(ChatMessage(
+          text: 'Error: $e',
+          isUser: false,
+        ));
+      });
+    }
+  }
+
+  void _toggleCasualMode(bool value) {
+    setState(() {
+      _isCasual = value;
+      AchatService.instance.casual = value;  // ✅ This fixes the error
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // This line connects to the new system
-    final chatNotifier = context.watch<ChatNotifier>();
-
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E), 
       appBar: AppBar(
-        title: const Text('AI Tutor 🤖'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: Text('AI Chat'),
         actions: [
+          Switch(
+            value: _isCasual,
+            onChanged: _toggleCasualMode,
+          ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () => context.read<ChatNotifier>().clearChat(),
+            icon: Icon(_showRomaji ? Icons.text_fields : Icons.text_snippet),
+            onPressed: () {
+              setState(() {
+                _showRomaji = !_showRomaji;
+              });
+            },
           ),
         ],
       ),
       body: Column(
         children: [
-          // 1. MESSAGES LIST
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: chatNotifier.messages.length,
-              itemBuilder: (context, index) {
-                final msg = chatNotifier.messages[index];
-                final isUser = msg.role == 'user';
-
-                return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isUser 
-                          ? const Color(0xFFFF5A79) 
-                          : const Color(0xFF1E1E32), 
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          msg.jp,
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                        if (!isUser && msg.en.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(msg.en, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                        ]
-                      ],
-                    ),
+              itemCount: _messages.length,
+              itemBuilder: (ctx, idx) {
+                final m = _messages[idx];
+                return ListTile(
+                  title: Text(m.text),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_showRomaji && (m.romaji?.isNotEmpty ?? false))
+                        Text('romaji: ${m.romaji}', style: TextStyle(fontSize: 12)),
+                      if (m.correction != null)
+                        Text('correction: ${m.correction}', style: TextStyle(fontSize: 12, color: Colors.green)),
+                    ],
                   ),
+                  trailing: m.isUser ? null : Icon(Icons.smart_toy),
                 );
               },
             ),
           ),
-
-          // 2. LOADING INDICATOR
-          if (chatNotifier.isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(color: Color(0xFFFF5A79)),
-            ),
-
-          // 3. INPUT BOX
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A2E),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: const Color(0xFFFF5A79)),
-                    ),
-                    child: TextField(
-                      controller: _textController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message...',
-                        hintStyle: TextStyle(color: Colors.white54),
-                        border: InputBorder.none,
-                      ),
-                    ),
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(hintText: 'Type a message...'),
                   ),
                 ),
-                const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Color(0xFFFF5A79)),
-                  onPressed: () {
-                    final text = _textController.text;
-                    if (text.isNotEmpty) {
-                      context.read<ChatNotifier>().sendMessage(text);
-                      _textController.clear();
-                    }
-                  },
+                  icon: Icon(Icons.send),
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
