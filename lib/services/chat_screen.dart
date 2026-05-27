@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/chat_notifier.dart';
-import '../services/ai_chat_service.dart'; // Needed for ChatMessage class
+import '../services/ai_chat_service.dart'; 
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -15,17 +15,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 🧠 LISTEN TO THE NEW MANAGER
+    // This line connects to the new system
     final chatNotifier = context.watch<ChatNotifier>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E), // Dark Background
+      backgroundColor: const Color(0xFF0F0F1E), 
       appBar: AppBar(
         title: const Text('AI Tutor 🤖'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          // Clear Chat Button
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () => context.read<ChatNotifier>().clearChat(),
@@ -50,8 +49,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: isUser 
-                          ? const Color(0xFFFF5A79) // Pink
-                          : const Color(0xFF1E1E32), // Dark Grey
+                          ? const Color(0xFFFF5A79) 
+                          : const Color(0xFF1E1E32), 
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -61,7 +60,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           msg.jp,
                           style: const TextStyle(color: Colors.white, fontSize: 16),
                         ),
-                        // Only show translation for AI messages
                         if (!isUser && msg.en.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(msg.en, style: const TextStyle(color: Colors.white54, fontSize: 12)),
@@ -111,7 +109,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   onPressed: () {
                     final text = _textController.text;
                     if (text.isNotEmpty) {
-                      // Send to the Manager
                       context.read<ChatNotifier>().sendMessage(text);
                       _textController.clear();
                     }
@@ -125,4 +122,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
