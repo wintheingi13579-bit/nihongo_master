@@ -26,6 +26,26 @@ jobs:
         run: |
           echo -e "\ndependency_overrides:\n  flutter_local_notifications: ^17.2.4" >> pubspec.yaml
 
+      - name: Generate Missing Project Assets
+        run: |
+          # Create the missing asset folders declared in pubspec
+          mkdir -p assets/images assets/audio
+          touch assets/images/.gitkeep assets/audio/.gitkeep
+          
+          # Create standard Android mipmap folder structures for the app icon
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          
+          # Download a temporary generic placeholder icon to satisfy the compiler
+          curl -s -o android/app/src/main/res/mipmap-hdpi/ic_launcher.png https://placeholder.co/72x72.png
+          curl -s -o android/app/src/main/res/mipmap-mdpi/ic_launcher.png https://placeholder.co/48x48.png
+          curl -s -o android/app/src/main/res/mipmap-xhdpi/ic_launcher.png https://placeholder.co/96x96.png
+          curl -s -o android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png https://placeholder.co/144x144.png
+          curl -s -o android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png https://placeholder.co/192x192.png
+
       - name: Fetch App Dependencies
         run: flutter pub get
 
