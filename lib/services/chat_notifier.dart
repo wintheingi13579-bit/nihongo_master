@@ -28,4 +28,3 @@ class ChatNotifier extends ChangeNotifier {
     notifyListeners();
   }
 }
-
